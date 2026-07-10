@@ -24,7 +24,7 @@ export default function PhotoGrid({
       <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[420px]">
         {/* Hero - large left image */}
         <button
-          onClick={() => onOpenLightbox(0)}
+          onClick={onOpenTour}
           className="col-span-2 row-span-2 relative group overflow-hidden focus:outline-none"
           aria-label={`View photo 1 of ${title}`}
         >
@@ -42,7 +42,7 @@ export default function PhotoGrid({
         {slots.slice(1).map((src, i) => (
           <button
             key={i}
-            onClick={() => onOpenLightbox(i + 1)}
+            onClick={onOpenTour}
             className="relative group overflow-hidden focus:outline-none"
             aria-label={`View photo ${i + 2} of ${title}`}
           >
