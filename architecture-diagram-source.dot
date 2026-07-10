@@ -1,0 +1,110 @@
+digraph Architecture {
+  rankdir=TB;
+  graph [fontname="Helvetica", bgcolor="#ffffff", pad="0.6", nodesep="0.45", ranksep="0.65", splines=spline, compound=true];
+  node [fontname="Helvetica", fontsize=12, shape=box, style="rounded,filled", color="#DDDDDD", penwidth=1.4];
+  edge [fontname="Helvetica", fontsize=10, color="#888888", arrowsize=0.7];
+
+  labelloc="t";
+  label="Vacation-Rental Marketplace \u2014 Production Architecture (Airbnb-scale)";
+  fontsize=20;
+  fontcolor="#222222";
+
+  // ===== CLIENT LAYER =====
+  subgraph cluster_client {
+    label="Client Layer";
+    style="rounded,filled"; color="#F7F7F7"; fontsize=13; fontcolor="#222222";
+    Web [label="Web App\n(Next.js, SSR/ISR)", fillcolor="#FFE8EC", color="#FF385C"];
+    Mobile [label="iOS / Android\n(Native)", fillcolor="#FFE8EC", color="#FF385C"];
+    CDN [label="CDN / Edge Cache\n(CloudFront + WAF)", fillcolor="#FFF3E0", color="#F5A623"];
+  }
+
+  // ===== EDGE / GATEWAY =====
+  subgraph cluster_edge {
+    label="Edge & API Gateway";
+    style="rounded,filled"; color="#F7F7F7"; fontsize=13;
+    LB [label="Global Load Balancer\n(Route53 + ALB, multi-region)", fillcolor="#E8F0FE", color="#4285F4"];
+    Gateway [label="API Gateway\n(auth, rate-limit, routing)", fillcolor="#E8F0FE", color="#4285F4"];
+  }
+
+  // ===== SERVICES =====
+  subgraph cluster_services {
+    label="Backend Microservices (Kubernetes, autoscaled)";
+    style="rounded,filled"; color="#F7F7F7"; fontsize=13;
+    UserSvc [label="User & Auth\nService", fillcolor="#E6F4EA", color="#34A853"];
+    ListingSvc [label="Listings Service", fillcolor="#E6F4EA", color="#34A853"];
+    SearchSvc [label="Search Service", fillcolor="#E6F4EA", color="#34A853"];
+    BookingSvc [label="Booking &\nReservation Service", fillcolor="#E6F4EA", color="#34A853"];
+    PaymentSvc [label="Payments Service\n(PCI-isolated)", fillcolor="#E6F4EA", color="#34A853"];
+    MsgSvc [label="Messaging Service", fillcolor="#E6F4EA", color="#34A853"];
+    ReviewSvc [label="Reviews Service", fillcolor="#E6F4EA", color="#34A853"];
+    NotifSvc [label="Notification Service\n(email/SMS/push)", fillcolor="#E6F4EA", color="#34A853"];
+  }
+
+  // ===== ASYNC / EVENTS =====
+  subgraph cluster_async {
+    label="Event Bus";
+    style="rounded,filled"; color="#F7F7F7"; fontsize=13;
+    Kafka [label="Kafka / SQS+SNS\n(booking.created, review.posted,\npayment.settled, ...)", fillcolor="#F3E8FD", color="#A142F4"];
+  }
+
+  // ===== DATA LAYER =====
+  subgraph cluster_data {
+    label="Data Layer";
+    style="rounded,filled"; color="#F7F7F7"; fontsize=13;
+    Postgres [label="PostgreSQL\n(sharded by region,\nread replicas)", fillcolor="#FEF7E0", color="#F9AB00"];
+    Redis [label="Redis Cache\n(sessions, hot listings,\nsearch cache)", fillcolor="#FEF7E0", color="#F9AB00"];
+    Elastic [label="OpenSearch / Elasticsearch\n(geo + full-text search index)", fillcolor="#FEF7E0", color="#F9AB00"];
+    ObjectStore [label="Object Storage\n(S3 - photos/videos)", fillcolor="#FEF7E0", color="#F9AB00"];
+    Warehouse [label="Data Warehouse\n(Snowflake/BigQuery,\nanalytics + ML features)", fillcolor="#FEF7E0", color="#F9AB00"];
+  }
+
+  // ===== PLATFORM / INFRA =====
+  subgraph cluster_infra {
+    label="Platform & Observability";
+    style="rounded,filled"; color="#F7F7F7"; fontsize=13;
+    CICD [label="CI/CD\n(GitHub Actions \u2192 ArgoCD,\ncanary/blue-green)", fillcolor="#EEEEEE", color="#5F6368"];
+    Observability [label="Metrics / Logs / Traces\n(Prometheus, Grafana,\nELK, Jaeger)", fillcolor="#EEEEEE", color="#5F6368"];
+    Secrets [label="Secrets & Config\n(Vault / KMS)", fillcolor="#EEEEEE", color="#5F6368"];
+  }
+
+  // ===== EDGES =====
+  Web -> CDN [style=dashed, label="static assets"];
+  Mobile -> CDN [style=dashed];
+  Web -> LB;
+  Mobile -> LB;
+  CDN -> LB [style=dashed, label="cache miss"];
+  LB -> Gateway;
+
+  Gateway -> UserSvc;
+  Gateway -> ListingSvc;
+  Gateway -> SearchSvc;
+  Gateway -> BookingSvc;
+  Gateway -> PaymentSvc;
+  Gateway -> MsgSvc;
+  Gateway -> ReviewSvc;
+
+  ListingSvc -> Postgres;
+  UserSvc -> Postgres;
+  BookingSvc -> Postgres;
+  PaymentSvc -> Postgres;
+  ReviewSvc -> Postgres;
+
+  ListingSvc -> ObjectStore [label="photo upload"];
+  SearchSvc -> Elastic;
+  ListingSvc -> Kafka [label="CDC stream", style=dotted];
+  Kafka -> Elastic [label="index update"];
+
+  BookingSvc -> Kafka [label="booking.created"];
+  PaymentSvc -> Kafka [label="payment.settled"];
+  ReviewSvc -> Kafka [label="review.posted"];
+  Kafka -> NotifSvc;
+  Kafka -> Warehouse [label="stream to analytics"];
+
+  ListingSvc -> Redis [dir=both, label="cache"];
+  SearchSvc -> Redis [dir=both];
+  BookingSvc -> Redis [dir=both];
+
+  CICD -> ListingSvc [lhead=cluster_services, label="deploys", color="#5F6368"];
+  Observability -> ListingSvc [dir=back, style=dotted, label="scrapes/traces", lhead=cluster_services, color="#5F6368"];
+  Secrets -> ListingSvc [dir=back, style=dotted, lhead=cluster_services, color="#5F6368"];
+}

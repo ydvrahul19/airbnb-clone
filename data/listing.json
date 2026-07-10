@@ -1,0 +1,246 @@
+{
+  "title": "Charming 1BHK with Hot Tub & Gym | Candolim, Goa",
+  "location": {
+    "area": "Candolim, Goa, India",
+    "neighbourhood": "Set in the heart of Candolim, this home offers a peaceful stay with easy access to the beach, cafés, and popular restaurants nearby.",
+    "mapCoordinates": { "lat": 15.518, "lng": 73.762 }
+  },
+  "propertyType": "Entire serviced apartment in Candolim, India",
+  "guests": 3,
+  "bedrooms": 1,
+  "beds": 1,
+  "bathrooms": 1,
+  "rating": 4.92,
+  "reviewCount": 24,
+  "isGuestFavourite": true,
+  "guestFavouriteText": "One of the most loved homes on Airbnb, according to guests",
+  "host": {
+    "name": "CoastalNest Homes",
+    "avatar": "/images/host-avatar.png",
+    "yearsHosting": 3,
+    "isVerified": true,
+    "totalReviews": 812,
+    "rating": 4.86,
+    "responseRate": 100,
+    "responseTime": "within an hour",
+    "bio": ["Born in the 90s", "Where I went to school: Goa University"],
+    "cohosts": [
+      { "name": "Jordan", "avatar": "/images/cohost-1.png" },
+      { "name": "Priya", "avatar": "/images/cohost-2.png" },
+      { "name": "Marcus", "avatar": "/images/cohost-3.png" }
+    ]
+  },
+  "highlights": [
+    {
+      "icon": "sunset",
+      "title": "Outdoor entertainment",
+      "description": "The shared hot tub and lounge terrace are great for evening stays."
+    },
+    {
+      "icon": "wind",
+      "title": "Designed for staying cool",
+      "description": "Beat the Goa heat with the A/C and ceiling fan."
+    },
+    {
+      "icon": "door-open",
+      "title": "Self check-in",
+      "description": "You can check in with the building staff."
+    }
+  ],
+  "description": "🌴 Plan Your Relaxing Holiday at this Candolim 1BHK! ✨ Stay in this cozy, sunlit apartment featuring warm wooden interiors, a fully equipped kitchen, and access to a shared rooftop hot tub 🛁 and gym 🏋️. Enjoy high-speed WiFi 💻, Smart TV 📺, and stylish decor throughout. Just minutes from Candolim Beach 🏖️, popular cafés, restaurants, and nightlife, it's the ideal base for your Goa holiday. Whether you're here to unwind by the hot tub, get a workout in, or explore the coast, this home has everything you need for a memorable stay.",
+  "rooms": {
+    "bedroom": { "label": "Bedroom", "detail": "1 double bed", "image": "/images/bedroom-a.jpg" },
+    "livingRoom": { "label": "Living room", "detail": "1 sofa", "image": "/images/living-room-1-a.jpg" }
+  },
+  "amenities": [
+    { "icon": "utensils", "label": "Kitchen", "available": true },
+    { "icon": "wifi", "label": "Wifi", "available": true },
+    { "icon": "monitor", "label": "Dedicated workspace", "available": true },
+    { "icon": "car", "label": "Free parking on premises", "available": true },
+    { "icon": "waves", "label": "Pool", "available": true },
+    { "icon": "dumbbell", "label": "Gym", "available": true },
+    { "icon": "bath", "label": "Hot tub", "available": true },
+    { "icon": "dog", "label": "Pets allowed", "available": true },
+    { "icon": "camera", "label": "Exterior security cameras on property", "available": true },
+    { "icon": "alarm-smoke", "label": "Carbon monoxide alarm", "available": false },
+    { "icon": "flame-off", "label": "Smoke alarm", "available": false }
+  ],
+  "amenitiesTotal": 42,
+  "pricing": {
+    "currency": "₹",
+    "pricePerFive": 28499,
+    "nights": 5,
+    "checkIn": "2026-10-18",
+    "checkOut": "2026-10-23",
+    "guests": 2,
+    "freeCancellationDate": "17 October",
+    "discountText": "Get 10% off your next stay."
+  },
+  "reviewCategories": {
+    "cleanliness": 4.9,
+    "accuracy": 4.9,
+    "checkIn": 4.95,
+    "communication": 5.0,
+    "location": 4.8,
+    "value": 4.7
+  },
+  "reviewTags": [
+    { "label": "Comfort", "count": 8 },
+    { "label": "Views", "count": 6 },
+    { "label": "Hot tub", "count": 5 },
+    { "label": "Condition", "count": 4 },
+    { "label": "Hospitality", "count": 9 },
+    { "label": "Cleanliness", "count": 5 },
+    { "label": "Amenities", "count": 3 }
+  ],
+  "reviews": [
+    {
+      "name": "Priya",
+      "avatar": null,
+      "tenure": "3 months on Airbnb",
+      "rating": 5,
+      "date": "2 weeks ago",
+      "text": "Very helpful and responsive team. Safe and peaceful stay, loved everything about the property."
+    },
+    {
+      "name": "Daniel",
+      "avatar": null,
+      "tenure": "4 years on Airbnb",
+      "rating": 5,
+      "date": "3 weeks ago",
+      "text": "We had a wonderful stay. The apartment was clean, comfortable, and exactly as shown in the photos. Would definitely stay again."
+    },
+    {
+      "name": "Meera",
+      "avatar": null,
+      "tenure": "1 year on Airbnb",
+      "rating": 5,
+      "date": "May 2026",
+      "text": "The host was incredibly helpful with local tips and check-in was seamless."
+    },
+    {
+      "name": "Tom",
+      "avatar": null,
+      "tenure": "5 years on Airbnb",
+      "rating": 5,
+      "date": "May 2026",
+      "text": "Amazing stay in Goa! The whole apartment was spotless and well-maintained. The hot tub on the terrace was a lovely surprise. Highly recommend."
+    },
+    {
+      "name": "Sarah",
+      "avatar": null,
+      "tenure": "2 years on Airbnb",
+      "rating": 5,
+      "date": "April 2026",
+      "text": "Perfect little retreat. Quiet, comfortable, and close to the beach. The gym was a nice bonus too."
+    },
+    {
+      "name": "Wei",
+      "avatar": null,
+      "tenure": "6 years on Airbnb",
+      "rating": 5,
+      "date": "March 2026",
+      "text": "Great communication from the host and a beautiful, well-kept space in a convenient location."
+    }
+  ],
+  "houseRules": {
+    "checkIn": "After 3:00 PM",
+    "checkOut": "Before 11:00 AM",
+    "maxGuests": 3
+  },
+  "safety": {
+    "carbonMonoxideAlarm": false,
+    "smokeAlarm": false,
+    "exteriorCameras": true
+  },
+  "nearbyStays": [
+    { "title": "Lakeview Studio with a view to die for", "price": 980, "rating": 4.91, "image": "/images/bedroom-c.jpg" },
+    { "title": "Mountainside 1BHK with private deck", "price": 1420, "rating": 4.95, "image": "/images/living-room-2-c.jpg" },
+    { "title": "Alpine Luxury Flat with fireplace", "price": 1560, "rating": 4.94, "image": "/images/living-room-1-b.jpg" },
+    { "title": "The Cozy Studio | 5 mins to trail", "price": 890, "rating": 4.96, "image": "/images/bedroom-b.jpg" },
+    { "title": "Luxury Cabin Bella 1BHK, lakeside", "price": 1350, "rating": 4.95, "image": "/images/kitchen-b.jpg" }
+  ],
+  "photoTour": [
+    {
+      "roomLabel": "Living room 1",
+      "tags": ["Sofa", "Air conditioning", "Ceiling fan", "TV"],
+      "images": [
+        "/images/living-room-1-a.jpg",
+        "/images/living-room-1-b.jpg",
+        "/images/living-room-1-c.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Living room 2",
+      "tags": ["Ceiling fan", "Hot tub"],
+      "images": [
+        "/images/living-room-2-a.jpg",
+        "/images/living-room-2-b.jpg",
+        "/images/living-room-2-c.jpg",
+        "/images/living-room-2-d.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Full kitchen",
+      "tags": ["Freezer", "Fridge", "Cooker", "Kettle", "Microwave", "Toaster"],
+      "images": [
+        "/images/kitchen-a.jpg",
+        "/images/kitchen-b.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Bedroom",
+      "tags": ["Double bed", "Air conditioning", "Ceiling fan", "Wifi"],
+      "images": [
+        "/images/bedroom-a.jpg",
+        "/images/bedroom-entrance.jpg",
+        "/images/bedroom-b.jpg",
+        "/images/bedroom-c.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Full bathroom",
+      "tags": ["Hairdryer", "Hot water", "Shampoo", "Shower gel"],
+      "images": [
+        "/images/bathroom-a.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Gym",
+      "tags": ["Air conditioning", "Gym", "Exercise equipment", "Ceiling fan"],
+      "images": [
+        "/images/gym-a.jpg",
+        "/images/gym-b.jpg",
+        "/images/gym-c.jpg",
+        "/images/gym-d.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Exterior",
+      "tags": ["Building view"],
+      "images": [
+        "/images/exterior-a.jpg",
+        "/images/exterior-b.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Pool",
+      "tags": ["Pool"],
+      "images": [
+        "/images/pool-a.jpg",
+        "/images/pool-b.jpg"
+      ]
+    },
+    {
+      "roomLabel": "Additional photos",
+      "tags": [],
+      "images": [
+        "/images/additional-a.jpg",
+        "/images/additional-b.jpg",
+        "/images/additional-c.jpg",
+        "/images/additional-d.jpg",
+        "/images/additional-e.jpg"
+      ]
+    }
+  ]
+}
