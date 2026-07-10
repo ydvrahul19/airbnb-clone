@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ArrowLeft, Share, Heart } from "lucide-react";
 import { useFocusTrap, captureActiveElement } from "@/lib/useFocusTrap";
@@ -16,6 +16,10 @@ interface PhotoTourProps {
   groups: PhotoTourGroup[];
   onClose: () => void;
   onOpenLightbox: (flatIndex: number) => void;
+  /** Ref holding the scroll position to restore on mount and keep updated
+   *  as the user scrolls. Lives in the parent so it survives Photo Tour
+   *  being unmounted/remounted around the lightbox. */
+  scrollPositionRef?: React.MutableRefObject<number>;
 }
 
 export default function PhotoTour({
@@ -23,6 +27,7 @@ export default function PhotoTour({
   groups,
   onClose,
   onOpenLightbox,
+  scrollPositionRef,
 }: PhotoTourProps) {
   const [showThumbnailGrid, setShowThumbnailGrid] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -34,6 +39,20 @@ export default function PhotoTour({
 
   // Flatten image list for lightbox index lookup
   const flatImages = groups.flatMap((g) => g.images);
+
+  // Restore the scroll position left off at (e.g. when returning from the
+  // lightbox) instead of always reopening at the top. Runs before paint so
+  // there's no visible flash of the thumbnail grid first.
+  useLayoutEffect(() => {
+    const el = scrollContainerRef.current;
+    const savedTop = scrollPositionRef?.current ?? 0;
+    if (el && savedTop > 0) {
+      el.scrollTop = savedTop;
+      setShowThumbnailGrid(savedTop < 80);
+    }
+    // Only run on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     previouslyFocused.current = captureActiveElement();
@@ -55,6 +74,9 @@ export default function PhotoTour({
     const el = scrollContainerRef.current;
     if (!el) return;
     setShowThumbnailGrid(el.scrollTop < 80);
+    if (scrollPositionRef) {
+      scrollPositionRef.current = el.scrollTop;
+    }
   };
 
   let runningIndex = 0;

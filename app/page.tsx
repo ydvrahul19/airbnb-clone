@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import listingData from "@/data/listing.json";
 import { Listing } from "@/lib/types";
 
@@ -38,6 +38,9 @@ export default function Home() {
   const [tourOpen, setTourOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  // Lives in the parent (which never unmounts) so Photo Tour's scroll
+  // position survives being closed/reopened around the lightbox.
+  const tourScrollTop = useRef(0);
 
   const openLightboxFromGrid = (index: number) => {
     setLightboxIndex(index % flatLightboxImages.length);
@@ -166,11 +169,15 @@ export default function Home() {
         <PhotoTour
           title={listing.title}
           groups={listing.photoTour}
-          onClose={() => setTourOpen(false)}
+          onClose={() => {
+            tourScrollTop.current = 0;
+            setTourOpen(false);
+          }}
           onOpenLightbox={(flatIndex) => {
             setTourOpen(false);
             openLightboxFromTour(flatIndex);
           }}
+          scrollPositionRef={tourScrollTop}
         />
       )}
 
