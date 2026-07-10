@@ -25,10 +25,12 @@ export default function PhotoTour({
   onOpenLightbox,
 }: PhotoTourProps) {
   const [showThumbnailGrid, setShowThumbnailGrid] = useState(true);
+  const [activeGroupIndex, setActiveGroupIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const groupRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useFocusTrap(containerRef, true);
 
@@ -51,13 +53,53 @@ export default function PhotoTour({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose]);
 
+  // Scroll-spy: keep the left column in sync with whichever room's
+  // photos are currently in view on the right.
+  useEffect(() => {
+    const root = scrollContainerRef.current;
+    if (!root) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Among groups currently intersecting the "active" band near the
+        // top of the scroll container, pick the one furthest up the page.
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length === 0) return;
+        const topMost = visible.reduce((a, b) =>
+          a.boundingClientRect.top <= b.boundingClientRect.top ? a : b
+        );
+        const idx = groupRefs.current.indexOf(
+          topMost.target as HTMLDivElement
+        );
+        if (idx !== -1) setActiveGroupIndex(idx);
+      },
+      {
+        root,
+        // Treat a band near the top of the visible area as "active"
+        rootMargin: "-15% 0px -70% 0px",
+        threshold: 0,
+      }
+    );
+
+    groupRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [groups]);
+
   const handleScroll = () => {
     const el = scrollContainerRef.current;
     if (!el) return;
     setShowThumbnailGrid(el.scrollTop < 80);
   };
 
-  let runningIndex = 0;
+  // Starting flat-index of each group, computed once per render pass
+  // (avoids mutating a variable during render).
+  const groupStartIndices = groups.reduce<number[]>((acc, g, gi) => {
+    acc.push(gi === 0 ? 0 : acc[gi - 1] + groups[gi - 1].images.length);
+    return acc;
+  }, []);
 
   return (
     <div
@@ -106,8 +148,7 @@ export default function PhotoTour({
               {showThumbnailGrid ? (
                 <div className="grid grid-cols-4 gap-3 animate-fade-in">
                   {groups.map((g, gi) => {
-                    const thumbIndex = runningIndex;
-                    runningIndex += g.images.length;
+                    const thumbIndex = groupStartIndices[gi];
                     return (
                       <button
                         key={gi}
@@ -129,47 +170,77 @@ export default function PhotoTour({
                   })}
                 </div>
               ) : (
-                <div className="space-y-8 animate-fade-in">
-                  {groups.map((g, gi) => (
-                    <div key={gi}>
-                      <h3 className="text-3xl font-semibold">{g.roomLabel}</h3>
-                      <p className="text-airbnb-secondary text-sm mt-1">
-                        {g.tags.join(" · ")}
-                      </p>
-                    </div>
-                  ))}
+                <div
+                  key={activeGroupIndex}
+                  className="animate-fade-in"
+                  aria-live="polite"
+                >
+                  <h3 className="text-3xl font-semibold">
+                    {groups[activeGroupIndex]?.roomLabel}
+                  </h3>
+                  {groups[activeGroupIndex]?.tags.length ? (
+                    <p className="text-airbnb-secondary text-sm mt-1">
+                      {groups[activeGroupIndex].tags.join(" · ")}
+                    </p>
+                  ) : null}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right column - scrolling images */}
-          <div className="space-y-3">
-            {(() => {
-              let idx = 0;
-              return groups.map((g, gi) => (
-                <div key={gi} className="space-y-3 mb-6">
-                  {g.images.map((img, ii) => {
-                    const flatIdx = idx++;
-                    return (
-                      <button
-                        key={ii}
-                        onClick={() => onOpenLightbox(flatIdx)}
-                        className="relative block w-full rounded-lg overflow-hidden aspect-[4/3]"
-                      >
-                        <Image
-                          src={img}
-                          alt={`${g.roomLabel} photo ${ii + 1}`}
-                          fill
-                          className="object-cover hover:brightness-95 transition-[filter] duration-200"
-                          sizes="500px"
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-              ));
-            })()}
+          {/* Right column - scrolling images, grouped by room */}
+          <div>
+            {groups.map((g, gi) => {
+              const [firstImg, ...restImgs] = g.images;
+              const firstFlatIdx = groupStartIndices[gi];
+              return (
+                  <div
+                    key={gi}
+                    ref={(el) => {
+                      groupRefs.current[gi] = el;
+                    }}
+                    className="space-y-3 mb-6"
+                  >
+                    {/* Large hero photo for the room */}
+                    <button
+                      onClick={() => onOpenLightbox(firstFlatIdx)}
+                      className="relative block w-full rounded-lg overflow-hidden aspect-[4/3] focus:outline-none"
+                    >
+                      <Image
+                        src={firstImg}
+                        alt={`${g.roomLabel} photo 1`}
+                        fill
+                        className="object-cover hover:brightness-95 transition-[filter] duration-200"
+                        sizes="500px"
+                      />
+                    </button>
+
+                    {/* Remaining photos for the room, in a 2-col grid */}
+                    {restImgs.length > 0 && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {restImgs.map((img, ii) => {
+                          const flatIdx = firstFlatIdx + ii + 1;
+                          return (
+                            <button
+                              key={ii}
+                              onClick={() => onOpenLightbox(flatIdx)}
+                              className="relative block w-full rounded-lg overflow-hidden aspect-[4/3] focus:outline-none"
+                            >
+                              <Image
+                                src={img}
+                                alt={`${g.roomLabel} photo ${ii + 2}`}
+                                fill
+                                className="object-cover hover:brightness-95 transition-[filter] duration-200"
+                                sizes="250px"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>
