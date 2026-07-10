@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Calendar from "./Calendar";
 
 function formatRange(checkIn: Date, checkOut: Date) {
@@ -11,17 +10,16 @@ function formatRange(checkIn: Date, checkOut: Date) {
 export default function TripDates({
   nights,
   area,
-  initialCheckIn,
-  initialCheckOut,
+  checkIn,
+  checkOut,
+  onDatesChange,
 }: {
   nights: number;
   area: string;
-  initialCheckIn: string;
-  initialCheckOut: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
+  onDatesChange: (checkIn: Date | null, checkOut: Date | null) => void;
 }) {
-  const [checkIn, setCheckIn] = useState<Date | null>(new Date(initialCheckIn));
-  const [checkOut, setCheckOut] = useState<Date | null>(new Date(initialCheckOut));
-
   return (
     <div className="py-8 border-b border-airbnb-border">
       <h2 className="text-xl font-semibold">
@@ -33,14 +31,7 @@ export default function TripDates({
         </p>
       )}
       <div className="mt-4 border border-airbnb-border rounded-2xl w-fit">
-        <Calendar
-          checkIn={checkIn}
-          checkOut={checkOut}
-          onSelect={(ci, co) => {
-            setCheckIn(ci);
-            setCheckOut(co);
-          }}
-        />
+        <Calendar checkIn={checkIn} checkOut={checkOut} onSelect={onDatesChange} />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import listingData from "@/data/listing.json";
 import { Listing } from "@/lib/types";
+import { nightsBetween, priceForNights, freeCancellationDateLabel } from "@/lib/dates";
 
 import Header from "@/components/Header";
 import PhotoGrid from "@/components/PhotoGrid";
@@ -34,10 +35,34 @@ const flatLightboxImages = listing.photoTour.flatMap((group) =>
 // Grid hero images = first image of first N groups (for the top photo grid)
 const heroGridImages = listing.photoTour.flatMap((g) => g.images);
 
+const pricePerNight = listing.pricing.pricePerFive / listing.pricing.nights;
+
 export default function Home() {
   const [tourOpen, setTourOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Trip dates are shared between the in-page calendar (TripDates) and the
+  // booking sidebar's calendar popover, so picking a date in either place
+  // updates both, along with the derived nights/price/free-cancellation text.
+  const [checkIn, setCheckIn] = useState<Date | null>(
+    new Date(listing.pricing.checkIn)
+  );
+  const [checkOut, setCheckOut] = useState<Date | null>(
+    new Date(listing.pricing.checkOut)
+  );
+
+  const handleDatesChange = (ci: Date | null, co: Date | null) => {
+    setCheckIn(ci);
+    setCheckOut(co);
+  };
+
+  const nights = nightsBetween(checkIn, checkOut, listing.pricing.nights);
+  const price = priceForNights(pricePerNight, nights);
+  const freeCancellationDate = freeCancellationDateLabel(
+    checkIn,
+    listing.pricing.freeCancellationDate
+  );
 
   const openLightboxFromGrid = (index: number) => {
     setLightboxIndex(index % flatLightboxImages.length);
@@ -74,9 +99,9 @@ export default function Home() {
         <div id="photos" className="scroll-mt-24" />
 
         <StickyNav
-          price={listing.pricing.pricePerFive}
+          price={price}
           currency={listing.pricing.currency}
-          nights={listing.pricing.nights}
+          nights={nights}
           rating={listing.rating}
           reviewCount={listing.reviewCount}
           onReserve={handleReserve}
@@ -112,12 +137,13 @@ export default function Home() {
           <div className="lg:col-span-1">
             <BookingSidebar
               currency={listing.pricing.currency}
-              pricePerFive={listing.pricing.pricePerFive}
-              nights={listing.pricing.nights}
-              initialCheckIn={listing.pricing.checkIn}
-              initialCheckOut={listing.pricing.checkOut}
+              price={price}
+              nights={nights}
+              checkIn={checkIn}
+              checkOut={checkOut}
+              onDatesChange={handleDatesChange}
               initialGuests={listing.pricing.guests}
-              freeCancellationDate={listing.pricing.freeCancellationDate}
+              freeCancellationDate={freeCancellationDate}
               discountText={listing.pricing.discountText}
               onReserve={handleReserve}
             />
@@ -126,10 +152,11 @@ export default function Home() {
 
         <div className="max-w-[1120px] mx-auto px-6 lg:px-0">
           <TripDates
-            nights={listing.pricing.nights}
+            nights={nights}
             area={listing.location.area}
-            initialCheckIn={listing.pricing.checkIn}
-            initialCheckOut={listing.pricing.checkOut}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            onDatesChange={handleDatesChange}
           />
           <Reviews
             rating={listing.rating}
@@ -154,7 +181,7 @@ export default function Home() {
             responseTime={listing.host.responseTime}
           />
           <ThingsToKnow
-            freeCancellationDate={listing.pricing.freeCancellationDate}
+            freeCancellationDate={freeCancellationDate}
             houseRules={listing.houseRules}
             safety={listing.safety}
           />

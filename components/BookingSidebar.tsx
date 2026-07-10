@@ -6,10 +6,11 @@ import Calendar from "./Calendar";
 
 interface BookingSidebarProps {
   currency: string;
-  pricePerFive: number;
+  price: number;
   nights: number;
-  initialCheckIn: string;
-  initialCheckOut: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
+  onDatesChange: (checkIn: Date | null, checkOut: Date | null) => void;
   initialGuests: number;
   freeCancellationDate: string;
   discountText: string;
@@ -23,17 +24,16 @@ function formatDate(d: Date | null) {
 
 export default function BookingSidebar({
   currency,
-  pricePerFive,
+  price,
   nights,
-  initialCheckIn,
-  initialCheckOut,
+  checkIn,
+  checkOut,
+  onDatesChange,
   initialGuests,
   freeCancellationDate,
   discountText,
   onReserve,
 }: BookingSidebarProps) {
-  const [checkIn, setCheckIn] = useState<Date | null>(new Date(initialCheckIn));
-  const [checkOut, setCheckOut] = useState<Date | null>(new Date(initialCheckOut));
   const [guests, setGuests] = useState(initialGuests);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [guestsOpen, setGuestsOpen] = useState(false);
@@ -75,7 +75,7 @@ export default function BookingSidebar({
       <div className="flex items-baseline gap-1 mb-4">
         <span className="text-xl font-semibold">
           {currency}
-          {pricePerFive.toLocaleString()}
+          {price.toLocaleString()}
         </span>
         <span className="text-sm">for {nights} nights</span>
       </div>
@@ -119,10 +119,7 @@ export default function BookingSidebar({
             <Calendar
               checkIn={checkIn}
               checkOut={checkOut}
-              onSelect={(ci, co) => {
-                setCheckIn(ci);
-                setCheckOut(co);
-              }}
+              onSelect={onDatesChange}
             />
           </div>
         )}
