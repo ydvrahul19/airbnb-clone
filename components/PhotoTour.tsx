@@ -18,6 +18,20 @@ interface PhotoTourProps {
   onOpenLightbox: (flatIndex: number) => void;
 }
 
+// Picks a column count that evenly divides the number of groups, so the
+// thumbnail overview grid's last row is always full (no lone orphan item).
+// Searches outward from a preferred count (4) within a sensible range.
+function getEvenColumnCount(total: number, preferred = 4, min = 2, max = 5) {
+  if (total <= min) return total || 1;
+  for (let c = preferred; c <= max; c++) {
+    if (total % c === 0) return c;
+  }
+  for (let c = preferred; c >= min; c--) {
+    if (total % c === 0) return c;
+  }
+  return preferred;
+}
+
 export default function PhotoTour({
   title,
   groups,
@@ -101,6 +115,8 @@ export default function PhotoTour({
     return acc;
   }, []);
 
+  const thumbnailColumns = getEvenColumnCount(groups.length);
+
   return (
     <div
       ref={containerRef}
@@ -146,7 +162,12 @@ export default function PhotoTour({
           <div className="relative">
             <div className="sticky top-10">
               {showThumbnailGrid ? (
-                <div className="grid grid-cols-4 gap-3 animate-fade-in">
+                <div
+                  className="grid gap-3 animate-fade-in"
+                  style={{
+                    gridTemplateColumns: `repeat(${thumbnailColumns}, minmax(0, 1fr))`,
+                  }}
+                >
                   {groups.map((g, gi) => {
                     const thumbIndex = groupStartIndices[gi];
                     return (
