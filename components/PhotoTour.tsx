@@ -18,27 +18,12 @@ interface PhotoTourProps {
   onOpenLightbox: (flatIndex: number) => void;
 }
 
-// Picks a column count that evenly divides the number of groups, so the
-// thumbnail overview grid's last row is always full (no lone orphan item).
-// Searches outward from a preferred count (4) within a sensible range.
-function getEvenColumnCount(total: number, preferred = 4, min = 2, max = 5) {
-  if (total <= min) return total || 1;
-  for (let c = preferred; c <= max; c++) {
-    if (total % c === 0) return c;
-  }
-  for (let c = preferred; c >= min; c--) {
-    if (total % c === 0) return c;
-  }
-  return preferred;
-}
-
 export default function PhotoTour({
   title,
   groups,
   onClose,
   onOpenLightbox,
 }: PhotoTourProps) {
-  const [showThumbnailGrid, setShowThumbnailGrid] = useState(true);
   const [activeGroupIndex, setActiveGroupIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -102,20 +87,12 @@ export default function PhotoTour({
     return () => observer.disconnect();
   }, [groups]);
 
-  const handleScroll = () => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-    setShowThumbnailGrid(el.scrollTop < 80);
-  };
-
   // Starting flat-index of each group, computed once per render pass
   // (avoids mutating a variable during render).
   const groupStartIndices = groups.reduce<number[]>((acc, g, gi) => {
     acc.push(gi === 0 ? 0 : acc[gi - 1] + groups[gi - 1].images.length);
     return acc;
   }, []);
-
-  const thumbnailColumns = getEvenColumnCount(groups.length);
 
   return (
     <div
@@ -152,69 +129,65 @@ export default function PhotoTour({
         </div>
       </div>
 
-      <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto"
-      >
-        <div className="max-w-5xl mx-auto grid grid-cols-2 gap-10 px-6 py-10">
-          {/* Left column */}
-          <div className="relative">
-            <div className="sticky top-10">
-              {showThumbnailGrid ? (
-                <div
-                  className="grid gap-3 animate-fade-in"
-                  style={{
-                    gridTemplateColumns: `repeat(${thumbnailColumns}, minmax(0, 1fr))`,
-                  }}
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+        <div className="max-w-5xl mx-auto px-6 py-10">
+          {/* Full-width thumbnail overview - wraps naturally based on
+              available width, same as the reference site (no forced
+              column count). */}
+          <div
+            className="grid gap-3 mb-12"
+            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))" }}
+          >
+            {groups.map((g, gi) => {
+              const thumbIndex = groupStartIndices[gi];
+              return (
+                <button
+                  key={gi}
+                  onClick={() => onOpenLightbox(thumbIndex)}
+                  className="text-left"
                 >
-                  {groups.map((g, gi) => {
-                    const thumbIndex = groupStartIndices[gi];
-                    return (
-                      <button
-                        key={gi}
-                        onClick={() => onOpenLightbox(thumbIndex)}
-                        className="text-left"
-                      >
-                        <div className="relative w-full aspect-square rounded-lg overflow-hidden">
-                          <Image
-                            src={g.images[0]}
-                            alt={g.roomLabel}
-                            fill
-                            className="object-cover"
-                            sizes="120px"
-                          />
-                        </div>
-                        <p className="text-xs mt-1 truncate">{g.roomLabel}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div
-                  key={activeGroupIndex}
-                  className="animate-fade-in"
-                  aria-live="polite"
-                >
-                  <h3 className="text-3xl font-semibold">
-                    {groups[activeGroupIndex]?.roomLabel}
-                  </h3>
-                  {groups[activeGroupIndex]?.tags.length ? (
-                    <p className="text-airbnb-secondary text-sm mt-1">
-                      {groups[activeGroupIndex].tags.join(" · ")}
-                    </p>
-                  ) : null}
-                </div>
-              )}
-            </div>
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                    <Image
+                      src={g.images[0]}
+                      alt={g.roomLabel}
+                      fill
+                      className="object-cover"
+                      sizes="120px"
+                    />
+                  </div>
+                  <p className="text-xs mt-1 truncate">{g.roomLabel}</p>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Right column - scrolling images, grouped by room */}
-          <div>
-            {groups.map((g, gi) => {
-              const [firstImg, ...restImgs] = g.images;
-              const firstFlatIdx = groupStartIndices[gi];
-              return (
+          {/* Two-column area: sticky current-room title (left) synced to
+              scroll position, grouped photos (right). */}
+          <div className="grid grid-cols-2 gap-10">
+            {/* Left column */}
+            <div className="relative">
+              <div
+                key={activeGroupIndex}
+                className="sticky top-10 animate-fade-in"
+                aria-live="polite"
+              >
+                <h3 className="text-3xl font-semibold">
+                  {groups[activeGroupIndex]?.roomLabel}
+                </h3>
+                {groups[activeGroupIndex]?.tags.length ? (
+                  <p className="text-airbnb-secondary text-sm mt-1">
+                    {groups[activeGroupIndex].tags.join(" · ")}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+
+            {/* Right column - scrolling images, grouped by room */}
+            <div>
+              {groups.map((g, gi) => {
+                const [firstImg, ...restImgs] = g.images;
+                const firstFlatIdx = groupStartIndices[gi];
+                return (
                   <div
                     key={gi}
                     ref={(el) => {
@@ -262,6 +235,7 @@ export default function PhotoTour({
                   </div>
                 );
               })}
+            </div>
           </div>
         </div>
       </div>
